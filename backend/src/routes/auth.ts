@@ -1,8 +1,8 @@
-// src/routes/auth.ts
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
+import { authMiddleware } from '../middleware/auth';
 
 const router = Router();
 
@@ -62,5 +62,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// GET /api/auth/me
+router.get('/me', authMiddleware, (req, res) => {
+    const user = (req as any).user;
+    res.json({ user });
+});
 
 export default router;
