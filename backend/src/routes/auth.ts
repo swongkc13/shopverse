@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import { authMiddleware } from '../middleware/auth';
+import { isAdmin } from '../middleware/isAdmin';
 
 const router = Router();
 
@@ -67,5 +68,9 @@ router.get('/me', authMiddleware, (req, res) => {
     const user = (req as any).user;
     res.json({ user });
 });
+
+router.get('/admin-test', authMiddleware, isAdmin, (req, res) => {
+  res.json({ message: 'Welcome Admin!' });
+})
 
 export default router;
