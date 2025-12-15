@@ -9,21 +9,22 @@ const router = Router();
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
 
   if (!name || !email || !password) {
-    return res.status(400).json({ message: 'All fields are required' });
+    return res.status(400).json({ message: 'Name, email and password required' });
   }
 
   try {
-    // Check if user already exists
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User with this email already exists' });
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashedPassword });
+
+   
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: role === 'admin' ? 'admin' : 'user', 
+    });
 
     res.status(201).json({ message: 'User created', userId: user.id });
   } catch (err: any) {
@@ -56,12 +57,13 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.json({ token });
+    res.json({ token, role: user.role });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
+
 
 // GET /api/auth/me
 router.get('/me', authMiddleware, (req, res) => {
